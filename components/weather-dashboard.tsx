@@ -9,25 +9,24 @@ interface WeatherCard {
   label: string;
 }
 
-const topCard: WeatherCard = {
-  icon: '🌡️',
-  value: '24',
-  unit: '°c',
-  label: 'Temperature',
-};
+const topCards: WeatherCard[] = [
+  { icon: '🌡️', value: '24', unit: '°c', label: 'Temperature' },
+  { icon: '🕐', value: '14:32', unit: '', label: 'Current Time' },
+];
 
-const twoRowCards: WeatherCard[] = [
+const threeRowCards: WeatherCard[] = [
   { icon: '💧', value: '65', unit: '%', label: 'Humidity' },
   { icon: '💨', value: '12', unit: 'km/h', label: 'Wind Speed' },
+  { icon: '🔽', value: '1013', unit: 'hPa', label: 'Pressure' },
 ];
 
 const gridCards: WeatherCard[] = [
   { icon: '👁️', value: '10', unit: 'km', label: 'Visibility' },
-  { icon: '🔽', value: '1013', unit: 'hPa', label: 'Pressure' },
   { icon: '☁️', value: '40', unit: '%', label: 'Cloud Cover' },
   { icon: '☀️', value: '6', unit: '', label: 'UV Index' },
   { icon: '🌧️', value: '20', unit: '%', label: 'Rain Chance' },
   { icon: '🌬️', value: '22', unit: '°c', label: 'Feels Like' },
+  { icon: '🌅', value: '06:45', unit: '', label: 'Sunrise' },
 ];
 
 interface CardState {
@@ -99,13 +98,13 @@ function WeatherCard({
       onFocus={() => setIsHovered(true)}
       onBlur={() => setIsHovered(false)}
       style={{
-        transform: `perspective(1200px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(${
+        transform: `perspective(${isLarge ? '1400px' : '1200px'}) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(${
           isHovered ? 16 : 0
         }px)`,
         transition: tilt.x === 0 && tilt.y === 0 ? 'transform 0.5s cubic-bezier(0.23, 1, 0.320, 1)' : 'none',
       }}
-      className={`group relative rounded-3xl overflow-hidden cursor-pointer outline-none ring-2 ring-transparent hover:ring-primary/50 focus:ring-primary/50 transition-all duration-300 ${
-        isLarge ? 'p-8 sm:p-10' : 'p-6 sm:p-8'
+      className={`group relative rounded-2xl sm:rounded-3xl overflow-hidden cursor-pointer outline-none ring-2 ring-transparent hover:ring-primary/50 focus:ring-primary/50 transition-all duration-300 ${
+        isLarge ? 'p-6 sm:p-8 md:p-10' : 'p-5 sm:p-6 md:p-8'
       }`}
     >
       {/* Base Card Background - shadcn card color */}
@@ -113,16 +112,16 @@ function WeatherCard({
 
       {/* Hover Shadow Effect - creates contrast from background */}
       <div
-        className={`absolute inset-0 rounded-3xl transition-all duration-500 ${
+        className={`absolute inset-0 rounded-2xl sm:rounded-3xl transition-all duration-500 ${
           isHovered
-            ? 'shadow-2xl shadow-primary/40'
-            : 'shadow-md shadow-primary/10'
+            ? 'shadow-xl sm:shadow-2xl shadow-primary/40'
+            : 'shadow-sm sm:shadow-md shadow-primary/10'
         }`}
       />
 
       {/* Depth overlay on hover */}
       <div
-        className={`absolute inset-0 bg-gradient-to-br from-primary/15 to-transparent rounded-3xl transition-opacity duration-500 ${
+        className={`absolute inset-0 bg-gradient-to-br from-primary/15 to-transparent rounded-2xl sm:rounded-3xl transition-opacity duration-500 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -131,63 +130,67 @@ function WeatherCard({
       <div className="relative z-10">
         {/* Icon */}
         <div
-          className={`mb-4 transition-all duration-500 ${
-            isLarge ? 'text-5xl sm:text-6xl' : 'text-4xl sm:text-5xl'
+          className={`mb-3 sm:mb-4 transition-all duration-500 ${
+            isLarge ? 'text-4xl sm:text-5xl md:text-6xl' : 'text-3xl sm:text-4xl md:text-5xl'
           } ${isHovered ? 'scale-105' : 'scale-100'}`}
         >
           {item.icon}
         </div>
 
         {/* Value */}
-        <div className="flex items-baseline gap-1 mb-2">
+        <div className="flex items-baseline gap-1 mb-1 sm:mb-2">
           <span
             className={`font-bold text-foreground transition-all duration-500 ${
-              isLarge ? 'text-4xl sm:text-5xl' : 'text-3xl sm:text-4xl'
+              isLarge ? 'text-3xl sm:text-4xl md:text-5xl' : 'text-2xl sm:text-3xl md:text-4xl'
             }`}
           >
             {item.value}
           </span>
-          <span className={`text-muted-foreground transition-all duration-500 ${isLarge ? 'text-2xl' : 'text-lg sm:text-xl'}`}>
+          <span className={`text-muted-foreground transition-all duration-500 ${isLarge ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg md:text-xl'}`}>
             {item.unit}
           </span>
         </div>
 
         {/* Label */}
-        <p className="text-muted-foreground text-sm sm:text-base font-medium">{item.label}</p>
+        <p className="text-muted-foreground text-xs sm:text-sm md:text-base font-medium">{item.label}</p>
       </div>
 
       {/* Glossy top-left highlight */}
-      <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-white/15 to-transparent rounded-full blur-3xl -m-16 pointer-events-none" />
+      <div className="absolute top-0 left-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-white/15 to-transparent rounded-full blur-2xl sm:blur-3xl -m-12 sm:-m-16 pointer-events-none" />
     </div>
   );
 }
 
 export function WeatherDashboard() {
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6 md:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background px-3 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:px-10 lg:py-12">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-10">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-2">
+        <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-1 sm:mb-2">
             Weather Dashboard
           </h1>
-          <p className="text-muted-foreground text-base sm:text-lg">Hover or touch cards to interact</p>
+          <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
+            Hover or touch cards to interact
+          </p>
         </div>
 
-        {/* Top Large Card */}
-        <div className="mb-6">
-          <WeatherCard item={topCard} isLarge={true} />
+        {/* Top Two Large Cards - Side by side on tablet+, stacked on mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-4 sm:mb-5 md:mb-6">
+          {topCards.map((item, index) => (
+            <WeatherCard key={index} item={item} isLarge={true} />
+          ))}
         </div>
 
-        {/* Two Cards Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
-          {twoRowCards.map((item, index) => (
+        {/* Three Cards Row - 1 col mobile, 3 cols from tablet+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-4 sm:mb-5 md:mb-6">
+          {threeRowCards.map((item, index) => (
             <WeatherCard key={index} item={item} />
           ))}
         </div>
 
-        {/* Six Cards Grid (3x2) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Six Cards Grid - 1 col mobile, 3 cols from tablet+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {gridCards.map((item, index) => (
             <WeatherCard key={index} item={item} />
           ))}
