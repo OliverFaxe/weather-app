@@ -1,9 +1,5 @@
-import { ComponentExample } from "@/components/component-example";
+import { WeatherDashboard } from "@/components/weather-dashboard";
 
 export default function Page() {
-return (
-  <div className="dark">
-    <ComponentExample />
-  </div>
-)
+  return <WeatherDashboard />;
 }
