@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { PopoverForm } from './btnform';
 
 interface WeatherCard {
   icon: string;
@@ -28,6 +29,15 @@ const gridCards: WeatherCard[] = [
   { icon: '🌬️', value: '22', unit: '°c', label: 'Feels Like' },
   { icon: '🌅', value: '06:45', unit: '', label: 'Sunrise' },
 ];
+
+let coordinates: {
+  latitude: number;
+  longitude: number;
+}
+
+/*coordinates.latitude = PopoverForm.arguments(latitude)
+
+localStorage.setItem(coordinates, )*/
 
 interface CardState {
   x: number;
@@ -170,9 +180,7 @@ export function WeatherDashboard() {
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-1 sm:mb-2">
             Weather Dashboard
           </h1>
-          <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-            Hover or touch cards to interact
-          </p>
+          <PopoverForm />
         </div>
 
         {/* Top Two Large Cards - Side by side on tablet+, stacked on mobile */}
