@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PopoverForm } from './btnform';
 
 interface WeatherCard {
@@ -9,35 +9,6 @@ interface WeatherCard {
   unit: string;
   label: string;
 }
-
-const topCards: WeatherCard[] = [
-  { icon: '🌡️', value: '24', unit: '°c', label: 'Temperature' },
-  { icon: '🕐', value: '14:32', unit: '', label: 'Current Time' },
-];
-
-const threeRowCards: WeatherCard[] = [
-  { icon: '💧', value: '65', unit: '%', label: 'Humidity' },
-  { icon: '💨', value: '12', unit: 'km/h', label: 'Wind Speed' },
-  { icon: '🔽', value: '1013', unit: 'hPa', label: 'Pressure' },
-];
-
-const gridCards: WeatherCard[] = [
-  { icon: '👁️', value: '10', unit: 'km', label: 'Visibility' },
-  { icon: '☁️', value: '40', unit: '%', label: 'Cloud Cover' },
-  { icon: '☀️', value: '6', unit: '', label: 'UV Index' },
-  { icon: '🌧️', value: '20', unit: '%', label: 'Rain Chance' },
-  { icon: '🌬️', value: '22', unit: '°c', label: 'Feels Like' },
-  { icon: '🌅', value: '06:45', unit: '', label: 'Sunrise' },
-];
-
-let coordinates: {
-  latitude: number;
-  longitude: number;
-}
-
-/*coordinates.latitude = PopoverForm.arguments(latitude)
-
-localStorage.setItem(coordinates, )*/
 
 interface CardState {
   x: number;
@@ -172,6 +143,113 @@ function WeatherCard({
 }
 
 export function WeatherDashboard() {
+  const [weatherData, setWeatherData] = useState<any>(null);
+
+  useEffect(() => {
+    const lat = localStorage.getItem("Latitude") || "55.60";
+    const lon = localStorage.getItem("Longitude") || "13.00";
+    
+    fetchData(parseFloat(lat), parseFloat(lon));
+  }, []);
+
+  function fetchData(latitude: number, longitude: number) {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,visibility&hourly=uv_index&daily=sunrise,sunset&timezone=auto`;
+    
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        setWeatherData(data);
+        console.log(data);
+      })
+      .catch(error => console.error('Error:', error));
+  }
+
+  const formatTime = (timeString: string) => {
+    if (!timeString) return '--:--';
+    const date = new Date(timeString);
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
+  const getCurrentTime = () => {
+    const now = new Date();
+    return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
+  const topCards: WeatherCard[] = [
+    { 
+      icon: '🌡️', 
+      value: weatherData?.current?.temperature_2m ? Math.round(weatherData.current.temperature_2m).toString() : '--', 
+      unit: '°c', 
+      label: 'Temperature' 
+    },
+    { 
+      icon: '🕐', 
+      value: getCurrentTime(), 
+      unit: '', 
+      label: 'Current Time' 
+    },
+  ];
+
+  const threeRowCards: WeatherCard[] = [
+    { 
+      icon: '💧', 
+      value: weatherData?.current?.relative_humidity_2m?.toString() || '--', 
+      unit: '%', 
+      label: 'Humidity' 
+    },
+    { 
+      icon: '💨', 
+      value: weatherData?.current?.wind_speed_10m ? Math.round(weatherData.current.wind_speed_10m).toString() : '--', 
+      unit: 'km/h', 
+      label: 'Wind Speed' 
+    },
+    { 
+      icon: '🔽', 
+      value: weatherData?.current?.pressure_msl ? Math.round(weatherData.current.pressure_msl).toString() : '--', 
+      unit: 'hPa', 
+      label: 'Pressure' 
+    },
+  ];
+
+  const gridCards: WeatherCard[] = [
+    { 
+      icon: '👁️', 
+      value: weatherData?.current?.visibility ? (weatherData.current.visibility / 1000).toFixed(1) : '--', 
+      unit: 'km', 
+      label: 'Visibility' 
+    },
+    { 
+      icon: '☁️', 
+      value: weatherData?.current?.cloud_cover?.toString() || '--', 
+      unit: '%', 
+      label: 'Cloud Cover' 
+    },
+    { 
+      icon: '☀️', 
+      value: weatherData?.hourly?.uv_index?.[0]?.toFixed(1) || '--', 
+      unit: '', 
+      label: 'UV Index' 
+    },
+    { 
+      icon: '🌧️', 
+      value: weatherData?.current?.precipitation?.toString() || '0', 
+      unit: 'mm', 
+      label: 'Precipitation' 
+    },
+    { 
+      icon: '🌬️', 
+      value: weatherData?.current?.apparent_temperature ? Math.round(weatherData.current.apparent_temperature).toString() : '--', 
+      unit: '°c', 
+      label: 'Feels Like' 
+    },
+    { 
+      icon: '🌅', 
+      value: formatTime(weatherData?.daily?.sunrise?.[0]), 
+      unit: '', 
+      label: 'Sunrise' 
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background px-3 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:px-10 lg:py-12">
       <div className="max-w-7xl mx-auto">

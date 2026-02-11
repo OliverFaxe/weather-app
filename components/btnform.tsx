@@ -13,13 +13,24 @@ import {
 import { useState } from "react"
 export function PopoverForm() {
 
-    const handleLatitudeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    localStorage.setItem("Latitude", e.target.value)
+  const [latitude, setLatitude] = useState("55.60")
+  const [longitude, setLongitude] = useState("13.00")
+
+  const handleLatitudeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLatitude(e.target.value) // Save to state, not localStorage yet
   }
 
   const handleLongitudeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    localStorage.setItem("Longitude", e.target.value)
+    setLongitude(e.target.value) // Save to state, not localStorage yet
   }
+
+  function updateCoordinates() {
+    // Now save both values when Save button is clicked
+    localStorage.setItem("Latitude", latitude)
+    localStorage.setItem("Longitude", longitude)
+    window.location.reload() // Refresh to fetch new weather data
+  }
+
 
   return (
     <Popover>
@@ -38,14 +49,17 @@ export function PopoverForm() {
             <FieldLabel htmlFor="latitude" className="w-1/2">
               Latitude
             </FieldLabel>
-            <Input id="width" defaultValue="55.60" onChange={handleLatitudeChange}/>
+            <Input id="latitude" value={latitude} onChange={handleLatitudeChange}/>
           </Field>
           <Field orientation="horizontal">
             <FieldLabel htmlFor="longitude" className="w-1/2">
               Longitude
             </FieldLabel>
-            <Input id="height" defaultValue="13.00" onChange={handleLongitudeChange}/>
+            <Input id="longitude" value={longitude} onChange={handleLongitudeChange}/>
           </Field>
+          <Button onClick={updateCoordinates} className="w-full mt-2">
+            Save
+          </Button>
         </FieldGroup>
       </PopoverContent>
     </Popover>
